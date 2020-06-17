@@ -1,0 +1,90 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    id "com.diffplug.eclipse.apt" version "3.22.0"
+    id "groovy"
+    id "application"
+    id "com.google.cloud.tools.jib" version "2.1.0"
+}
+
+version "0.1"
+group "com.idexx"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    // for dependencies that are needed for development only
+    developmentOnly
+}
+
+dependencies {
+    annotationProcessor(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+    annotationProcessor("io.micronaut:micronaut-inject-java")
+    annotationProcessor("io.micronaut:micronaut-validation")
+    implementation(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+    implementation("io.micronaut:micronaut-inject")
+    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut:micronaut-runtime")
+    implementation("javax.annotation:javax.annotation-api")
+    implementation("io.micronaut:micronaut-http-server-netty")
+    implementation("io.micronaut:micronaut-http-client")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    testImplementation(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+    testImplementation("io.micronaut:micronaut-inject-groovy")
+    testImplementation("org.spockframework:spock-core") {
+        exclude group: "org.codehaus.groovy", module: "groovy-all"
+    }
+    testImplementation("io.micronaut.test:micronaut-test-spock")
+}
+
+test.classpath += configurations.developmentOnly
+
+mainClassName = "com.idexx.Application"
+
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion('13')
+    targetCompatibility = JavaVersion.toVersion('13')
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll([
+        '-parameters',
+        // enables incremental compilation
+        '-Amicronaut.processing.incremental=true',
+        '-Amicronaut.processing.annotations=com.idexx.*',
+        "-Amicronaut.processing.group=$project.group",
+        "-Amicronaut.processing.module=$project.name",
+    ])
+}
+
+
+tasks.withType(JavaExec) {
+    classpath += configurations.developmentOnly
+    jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
+    if (gradle.startParameter.continuous) {
+        systemProperties(
+            'micronaut.io.watch.restart':'true',
+            'micronaut.io.watch.enabled':'true',
+            "micronaut.io.watch.paths":"src/main"
+        )
+    }
+}
+
+
+jib.from.image = 'openjdk:14-alpine'
+//jib.to.image = "gcr.io/gdos-mdonahue-sb/gdos-clinicalrelevance:${new SimpleDateFormat('MMMdd-HHmmss').format(new Date())}"
+jib.to.image = "gcr.io/gdos-mdonahue-sb/pubsub-message-viewer:${new SimpleDateFormat('MMMdd-HHmmss').format(new Date())}"
+jib.container.mainClass = 'com.idexx.Application'
+
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+}

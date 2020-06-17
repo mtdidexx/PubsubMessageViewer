@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.idexx
+testFramework: spock
+sourceLanguage: java
+buildTool: gradle
+features: [annotation-api, app-name, docker, file-watch, gradle, http-client, java, java-application, jib, logback, netty-server, readme, spock, yaml]
