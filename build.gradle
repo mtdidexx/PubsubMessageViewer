@@ -4,7 +4,7 @@ plugins {
     id "com.diffplug.eclipse.apt" version "3.22.0"
     id "groovy"
     id "application"
-    id "com.google.cloud.tools.jib" version "2.1.0"
+    id "com.google.cloud.tools.jib" version "2.4.0"
 }
 
 version "0.1"
@@ -81,8 +81,7 @@ tasks.withType(JavaExec) {
 
 
 jib.from.image = 'openjdk:14-alpine'
-//jib.to.image = "gcr.io/gdos-mdonahue-sb/gdos-clinicalrelevance:${new SimpleDateFormat('MMMdd-HHmmss').format(new Date())}"
-jib.to.image = "gcr.io/gdos-mdonahue-sb/pubsub-message-viewer:${new SimpleDateFormat('MMMdd-HHmmss').format(new Date())}"
+jib.to.image = "gcr.io/${gcp_project}/pubsub-message-viewer:${new SimpleDateFormat('MMMdd-HHmmss').format(new Date())}"
 jib.container.mainClass = 'com.idexx.Application'
 
 wrapper {

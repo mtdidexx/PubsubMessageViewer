@@ -11,8 +11,14 @@ These steps assume that your topic has already been created
 ### Create subscription
 `gcloud pubsub subscriptions create loggingsubscription --topic=projects/gdos-mdonahue-sb/topics/resultingsync --labels=gdos=pubsub --push-endpoint=https://message-viewer-p62273dhmq-uc.a.run.app/subscription/logMessage --push-auth-service-account resultingsync-sa@gdos-mdonahue-sb.iam.gserviceaccount.com`
 
+### GCP permissions
+1. Enable Pub/Sub to create authentication tokens in your project:
+2. Create or select a service account to represent the Pub/Sub subscription identity.
+3. Create a Pub/Sub subscription with the service account
+
 ## GCP Documentation
 - https://cloud.google.com/run/docs/tutorials/pubsub#run_pubsub_server-java 
+- https://cloud.google.com/run/docs/deploying#other-projects
 - https://cloud.google.com/sdk/gcloud/reference/pubsub/subscriptions/create
 - https://cloud.google.com/sdk/gcloud/reference/run/deploy
 - https://cloud.google.com/sdk/gcloud/reference/run/services/add-iam-policy-binding
